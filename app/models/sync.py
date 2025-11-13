@@ -1,0 +1,12 @@
+from sqlalchemy import Column, Integer, String, JSON, DateTime, func
+from app.db.database import Base
+
+class SyncQueue(Base):
+    __tablename__ = "sync_queue"
+
+    id = Column(Integer, primary_key=True, index=True)
+    entity = Column(String, nullable=False)        # Nombre de la entidad (ej: "cliente", "pedido")
+    payload = Column(JSON, nullable=False)         # Datos serializados del cambio offline
+    device_id = Column(String, nullable=False)     # Identificador del dispositivo que envía el dato
+    synced_at = Column(DateTime, nullable=True)    # Cuándo se sincronizó con éxito
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)

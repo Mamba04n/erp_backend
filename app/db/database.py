@@ -42,4 +42,5 @@ def init_db() -> None:
 	"""Create database tables for all registered models (if they don't exist)."""
 	# Import models here so they are registered on the metadata before create_all()
 	# from app import models  # uncomment/adjust when you add model modules
+	from app.models import sync 
 	Base.metadata.create_all(bind=engine)
