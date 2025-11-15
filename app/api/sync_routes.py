@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
@@ -40,3 +41,27 @@ def sync_status(device_id: str, db: Session = Depends(get_db)):
     if not status:
         raise HTTPException(status_code=404, detail="No hay registros de sincronización para este dispositivo")
     return {"device_id": device_id, "last_sync": status}
+=======
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.db import get_db
+from app.services.sync_service import (
+    handle_push,
+    handle_pull,
+    get_sync_status
+)
+
+router = APIRouter()
+
+@router.post("/push")
+def sync_push(data: dict, db: Session = Depends(get_db)):
+    return handle_push(data, db)
+
+@router.post("/pull")
+def sync_pull(data: dict, db: Session = Depends(get_db)):
+    return handle_pull(data, db)
+
+@router.get("/status/{device_id}")
+def sync_status(device_id: str, db: Session = Depends(get_db)):
+    return get_sync_status(device_id, db)
+>>>>>>> Stashed changes

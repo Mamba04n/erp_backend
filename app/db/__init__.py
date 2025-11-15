@@ -37,9 +37,9 @@ def get_db() -> Generator:
     finally:
         db.close()
 
+from app.models import sync  # importa los modelos para que SQLAlchemy los registre
 
 def init_db() -> None:
-    """Initialize database (create tables). Import models first if any exist."""
-    # Import your models here so they are registered on the metadata before create_all()
-    # from app import models  # Uncomment/adjust if you add models package
+    from app.models import sync  # IMPORTANTE
+
     Base.metadata.create_all(bind=engine)
