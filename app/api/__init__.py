@@ -1,9 +1,6 @@
 from fastapi import APIRouter
-<<<<<<< Updated upstream
-=======
 from .sync_routes import router as sync_router
 
->>>>>>> Stashed changes
 router = APIRouter()
 
 # Rutas generales
