@@ -1,5 +1,4 @@
 # app/api/products.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -7,6 +6,7 @@ from pydantic import BaseModel
 from app.db import get_db
 from app.models.products import Product
 from app.core.events import event_bus, log_sync   # <-- Usamos event_bus
+from app.core.events import emit_event, log_sync
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -54,6 +54,9 @@ def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
 # Listar productos
 # -----------------------------
 
+    return product
+
+
 @router.get("/", response_model=list[ProductOut])
 def list_products(db: Session = Depends(get_db)):
     return db.query(Product).all()
@@ -81,6 +84,7 @@ async def update_stock(
     # ---------------------------------------------------------
     # Registrar log del cambio de stock (tu lógica original)
     # ---------------------------------------------------------
+    # log en sync_logs
     log_sync(
         db=db,
         action="product.stock_changed",
@@ -107,6 +111,14 @@ async def update_stock(
     # ---------------------------------------------------------
     if product.stock == 0:
 
+    # evento en WebSocket
+    await emit_event(
+        "product.stock_changed",
+        {"product_id": product.id, "old_stock": old_stock, "new_stock": product.stock},
+    )
+
+    # si queda en 0, evento adicional
+    if product.stock == 0:
         log_sync(
             db=db,
             action="product.out_of_stock",
@@ -122,5 +134,9 @@ async def update_stock(
                 "product_id": product.id
             }
         })
+        await emit_event(
+            "product.out_of_stock",
+            {"product_id": product.id},
+        )
 
     return product

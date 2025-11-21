@@ -7,7 +7,8 @@ from app.db import get_db
 from app.models.orders import Order, OrderItem
 from app.models.clients import Client
 from app.models.products import Product
-from app.core.events import event_bus, log_sync   # <-- Actualizado: usamos event_bus
+from app.core.events import event_bus, log_sync  
+from app.core.events import emit_event, log_sync
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -88,9 +89,10 @@ async def create_order(payload: OrderCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(order)
 
-    # -----------------------------
+
     # Registrar log de sincronización
     # -----------------------------
+    # log en sync_logs
     log_sync(
         db=db,
         action="order.created",
@@ -117,6 +119,16 @@ async def create_order(payload: OrderCreate, db: Session = Depends(get_db)):
             "items_count": len(order.items),
         }
     })
+
+    # evento WS
+    await emit_event(
+        "order.created",
+        {
+            "order_id": order.id,
+            "client_id": client.id,
+            "items_count": len(order.items),
+        },
+    )
 
     return order
 

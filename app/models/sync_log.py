@@ -1,6 +1,7 @@
 # app/models/sync_log.py
 from datetime import datetime
 from sqlalchemy import JSON
+
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from app.db import Base  # usamos el Base que ya define tu proyecto
 
@@ -18,6 +19,7 @@ class SyncLog(Base):
     # Resultado
     status = Column(String(20), default="success")  # 'success' | 'error'
     details_json = Column(JSON, nullable=True)      # JSON con detalles
+    details_json = Column(Text, nullable=True)      # JSON con detalles
 
     # Cuándo
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
