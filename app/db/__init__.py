@@ -43,3 +43,6 @@ def init_db() -> None:
     # Import your models here so they are registered on the metadata before create_all()
     # from app import models  # Uncomment/adjust if you add models package
     Base.metadata.create_all(bind=engine)
+
+
+    

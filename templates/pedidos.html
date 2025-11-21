@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRIDAYS ERP - Gestión de Pedidos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <!-- Sidebar derecho -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-store"></i> <span>FRIDAYS ERP</span></h2>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <div class="user-details">
+                <div class="user-name">Admin User</div>
+                <div class="user-role">Administrador</div>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">Principal</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Mapa de Rutas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-title">Gestión Comercial</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="clientes.html">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-tag"></i>
+                            <span>Productos</span>
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="pedidos.html">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="facturizacion.html">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-title">Operaciones</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventario</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-truck"></i>
+                            <span>Entregas</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-route"></i>
+                            <span>Rutas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-title">Administración</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Cuentas por Cobrar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Gestión de Pedidos</h1>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar pedido...">
+                </div>
+                <div class="notification-btn">
+                    <i class="far fa-bell"></i>
+                    <div class="notification-badge">5</div>
+                </div>
+                <div class="user-menu-btn">
+                    <i class="far fa-user"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Estado:</span>
+                <select class="filter-select">
+                    <option>Todos los estados</option>
+                    <option>Pendiente</option>
+                    <option>Preparado</option>
+                    <option>En ruta</option>
+                    <option>Entregado</option>
+                    <option>Cancelado</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Fecha:</span>
+                <select class="filter-select">
+                    <option>Hoy</option>
+                    <option>Esta semana</option>
+                    <option>Este mes</option>
+                    <option>Personalizado</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Cliente:</span>
+                <select class="filter-select">
+                    <option>Todos los clientes</option>
+                    <option>Pulpería San José</option>
+                    <option>Mini Super Rivas</option>
+                    <option>Abastecimiento Tola</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-outline">
+                <i class="fas fa-filter"></i> Aplicar Filtros
+            </button>
+        </div>
+        
+        <!-- Tarjetas de estadísticas -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value">42</div>
+                <div class="stat-label">Pedidos Hoy</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">28</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">En Ruta</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">C$ 125,420</div>
+                <div class="stat-label">Valor Total</div>
+            </div>
+        </div>
+        
+        <!-- Tabs para diferentes vistas -->
+
+        <!-- Tabla de pedidos -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Lista de Pedidos</div>
+                <div class="table-actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="openModal()">
+                        <i class="fas fa-plus"></i> Nuevo Pedido
+                    </button>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Productos</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#00125</td>
+                        <td>Pulpería San José</td>
+                        <td>12/08/2023<br><small>10:30 AM</small></td>
+                        <td>5 productos</td>
+                        <td>C$ 5,842.00</td>
+                        <td><span class="status status-delivered">Entregado</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles"></i>
+                            <i class="fas fa-edit action-icon" title="Editar"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Generar PDF"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#00124</td>
+                        <td>Mini Super Rivas</td>
+                        <td>12/08/2023<br><small>09:15 AM</small></td>
+                        <td>8 productos</td>
+                        <td>C$ 8,756.50</td>
+                        <td><span class="status status-route">En Ruta</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles"></i>
+                            <i class="fas fa-edit action-icon" title="Editar"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Generar PDF"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#00123</td>
+                        <td>Abastecimiento Tola</td>
+                        <td>11/08/2023<br><small>03:45 PM</small></td>
+                        <td>12 productos</td>
+                        <td>C$ 12,450.00</td>
+                        <td><span class="status status-prepared">Preparado</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles"></i>
+                            <i class="fas fa-edit action-icon" title="Editar"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Generar PDF"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#00122</td>
+                        <td>Pulpería La Esperanza</td>
+                        <td>11/08/2023<br><small>11:20 AM</small></td>
+                        <td>7 productos</td>
+                        <td>C$ 6,325.25</td>
+                        <td><span class="status status-pending">Pendiente</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles"></i>
+                            <i class="fas fa-edit action-icon" title="Editar"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Generar PDF"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#00121</td>
+                        <td>Tienda El Buen Precio</td>
+                        <td>10/08/2023<br><small>02:10 PM</small></td>
+                        <td>4 productos</td>
+                        <td>C$ 3,845.00</td>
+                        <td><span class="status status-delivered">Entregado</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles"></i>
+                            <i class="fas fa-edit action-icon" title="Editar"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Generar PDF"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Modal para nuevo pedido -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 class="modal-title">Nuevo Pedido</h3>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cliente *</label>
+                        <select class="form-select">
+                            <option>Seleccionar cliente</option>
+                            <option>Pulpería San José</option>
+                            <option>Mini Super Rivas</option>
+                            <option>Abastecimiento Tola</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Fecha de entrega *</label>
+                        <input type="date" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Productos *</label>
+                    <div class="product-selector">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar producto...">
+                        </div>
+                        <div class="product-list">
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <div class="product-name">Arroz Imperial 50kg</div>
+                                    <div class="product-details">Disponible: 120 units · Precio: C$ 850.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <input type="number" min="0" class="quantity-input" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <div class="product-name">Aceite Capistrano 1L</div>
+                                    <div class="product-details">Disponible: 85 units · Precio: C$ 45.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <input type="number" min="0" class="quantity-input" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <div class="product-name">Frijol Rojo 25kg</div>
+                                    <div class="product-details">Disponible: 65 units · Precio: C$ 1,250.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <input type="number" min="0" class="quantity-input" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Notas adicionales</label>
+                    <textarea class="form-input" rows="3" placeholder="Instrucciones especiales para la entrega..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary">Guardar Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para manejar la interacción del menú
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Cambiar el título de la página según la selección
+                const pageTitle = this.querySelector('span').textContent;
+                document.querySelector('.page-title').textContent = pageTitle;
+            });
+        });
+        
+        // Script para las tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Script para el modal
+        function openModal() {
+            document.getElementById('orderModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('orderModal').style.display = 'none';
+        }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>

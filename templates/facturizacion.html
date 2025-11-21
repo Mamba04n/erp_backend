@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FRIDAYS ERP - Módulo de Facturación</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        /* Estilos adicionales para la vista previa de factura */
+        .invoice-preview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .invoice-container {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 20px;
+        }
+        
+        .company-info {
+            flex: 2;
+        }
+        
+        .invoice-info {
+            flex: 1;
+            text-align: right;
+        }
+        
+        .invoice-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .client-info, .payment-info {
+            flex: 1;
+        }
+        
+        .invoice-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        
+        .invoice-items th {
+            background-color: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .invoice-items td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .invoice-totals {
+            width: 300px;
+            margin-left: auto;
+        }
+        
+        .invoice-totals .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        
+        .invoice-totals .grand-total {
+            font-weight: bold;
+            font-size: 18px;
+            border-top: 2px solid #333;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+        
+        .invoice-footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+        
+        .invoice-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .print-only {
+            display: none;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .invoice-container, .invoice-container * {
+                visibility: visible;
+            }
+            .invoice-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+            .invoice-actions {
+                display: none;
+            }
+            .print-only {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar derecho -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-store"></i> <span>FRIDAYS ERP</span></h2>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-avatar">A</div>
+            <div class="user-details">
+                <div class="user-name">Admin User</div>
+                <div class="user-role">Administrador</div>
+            </div>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-section">
+                <div class="menu-title">Principal</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-map-marked-alt"></i>
+                            <span>Mapa de Rutas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-title">Gestión Comercial</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="clientes.html">
+                            <i class="fas fa-users"></i>
+                            <span>Clientes</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-tag"></i>
+                            <span>Productos</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="pedidos.html">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="facturizacion.html">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-title">Operaciones</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventario</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-truck"></i>
+                            <span>Entregas</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-route"></i>
+                            <span>Rutas</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="menu-section">
+                <div class="menu-title">Administración</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Cuentas por Cobrar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Configuración</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">Módulo de Facturación</h1>
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar factura...">
+                </div>
+                <div class="notification-btn">
+                    <i class="far fa-bell"></i>
+                    <div class="notification-badge">2</div>
+                </div>
+                <div class="user-menu-btn">
+                    <i class="far fa-user"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Estado:</span>
+                <select class="filter-select">
+                    <option>Todas las facturas</option>
+                    <option>Pendientes</option>
+                    <option>Pagadas</option>
+                    <option>Vencidas</option>
+                    <option>Anuladas</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Fecha:</span>
+                <select class="filter-select">
+                    <option>Hoy</option>
+                    <option>Esta semana</option>
+                    <option>Este mes</option>
+                    <option>Personalizado</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <span class="filter-label">Cliente:</span>
+                <select class="filter-select">
+                    <option>Todos los clientes</option>
+                    <option>Pulpería San José</option>
+                    <option>Mini Super Rivas</option>
+                    <option>Abastecimiento Tola</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-outline">
+                <i class="fas fa-filter"></i> Aplicar Filtros
+            </button>
+        </div>
+        
+        <!-- Tarjetas de estadísticas -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value">28</div>
+                <div class="stat-label">Facturas Emitidas</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">C$ 86,420</div>
+                <div class="stat-label">Total Facturado</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Pendientes de Pago</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-value">C$ 12,542</div>
+                <div class="stat-label">Por Cobrar</div>
+            </div>
+        </div>
+        
+        <!-- Tabs para diferentes vistas -->
+        <!-- Tabla de facturas -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">Historial de Facturas</div>
+                <div class="table-actions">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <button class="btn btn-primary" onclick="openCreateModal()">
+                        <i class="fas fa-plus"></i> Nueva Factura
+                    </button>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>N° Factura</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Vencimiento</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>001-001-01-0000125</td>
+                        <td>Pulpería San José</td>
+                        <td>12/08/2023</td>
+                        <td>22/08/2023</td>
+                        <td>C$ 5,842.00</td>
+                        <td><span class="status status-delivered">Pagada</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles" onclick="viewInvoice(1)"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Descargar PDF"></i>
+                            <i class="fas fa-envelope action-icon" title="Enviar por email"></i>
+                            <i class="fas fa-print action-icon" title="Imprimir" onclick="printInvoice(1)"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>001-001-01-0000124</td>
+                        <td>Mini Super Rivas</td>
+                        <td>11/08/2023</td>
+                        <td>21/08/2023</td>
+                        <td>C$ 8,756.50</td>
+                        <td><span class="status status-pending">Pendiente</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles" onclick="viewInvoice(2)"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Descargar PDF"></i>
+                            <i class="fas fa-envelope action-icon" title="Enviar por email"></i>
+                            <i class="fas fa-print action-icon" title="Imprimir" onclick="printInvoice(2)"></i>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>001-001-01-0000123</td>
+                        <td>Abastecimiento Tola</td>
+                        <td>10/08/2023</td>
+                        <td>20/08/2023</td>
+                        <td>C$ 12,450.00</td>
+                        <td><span class="status status-pending">Pendiente</span></td>
+                        <td>
+                            <i class="fas fa-eye action-icon" title="Ver detalles" onclick="viewInvoice(3)"></i>
+                            <i class="fas fa-file-pdf action-icon" title="Descargar PDF"></i>
+                            <i class="fas fa-envelope action-icon" title="Enviar por email"></i>
+                            <i class="fas fa-print action-icon" title="Imprimir" onclick="printInvoice(3)"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Modal para nueva factura -->
+    <div class="modal" id="createModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 class="modal-title">Nueva Factura</h3>
+                <span class="modal-close" onclick="closeModal('createModal')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cliente *</label>
+                        <select class="form-select">
+                            <option>Seleccionar cliente</option>
+                            <option>Pulpería San José</option>
+                            <option>Mini Super Rivas</option>
+                            <option>Abastecimiento Tola</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Fecha de vencimiento *</label>
+                        <input type="date" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Productos *</label>
+                    <div class="product-selector">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar producto...">
+                        </div>
+                        <div class="product-list">
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <div class="product-name">Arroz Imperial 50kg</div>
+                                    <div class="product-details">Disponible: 120 units · Precio: C$ 850.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <input type="number" min="0" class="quantity-input" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <div class="product-name">Aceite Capistrano 1L</div>
+                                    <div class="product-details">Disponible: 85 units · Precio: C$ 45.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <input type="number" min="0" class="quantity-input" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-info">
+                                    <div class="product-name">Frijol Rojo 25kg</div>
+                                    <div class="product-details">Disponible: 65 units · Precio: C$ 1,250.00</div>
+                                </div>
+                                <div class="product-actions">
+                                    <input type="number" min="0" class="quantity-input" placeholder="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Condiciones de pago</label>
+                        <select class="form-select">
+                            <option>Contado</option>
+                            <option>Crédito 15 días</option>
+                            <option>Crédito 30 días</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Tipo de factura</label>
+                        <select class="form-select">
+                            <option>Consumidor Final</option>
+                            <option>Crédito Fiscal</option>
+                            <option>Exportación</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Observaciones</label>
+                    <textarea class="form-input" rows="2" placeholder="Notas adicionales para la factura..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('createModal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="previewInvoice()">Vista Previa</button>
+                <button class="btn btn-primary">Generar Factura</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista previa de factura -->
+    <div class="invoice-preview" id="invoicePreview">
+        <div class="invoice-container">
+            <div class="invoice-header">
+                <div class="company-info">
+                    <h2>DISTRIBUIDORA FRIDAYS</h2>
+                    <p>RUC: 001-280789-1005A</p>
+                    <p>Teléfono: 2563-7890</p>
+                    <p>Email: info@fridays.com.ni</p>
+                    <p>Dirección: Km 12.5 Carretera a Tola, Rivas</p>
+                </div>
+                <div class="invoice-info">
+                    <div class="invoice-title">FACTURA</div>
+                    <p><strong>No:</strong> 001-001-01-0000125</p>
+                    <p><strong>Fecha:</strong> 12/08/2023</p>
+                    <p><strong>Vence:</strong> 22/08/2023</p>
+                </div>
+            </div>
+            
+            <div class="invoice-details">
+                <div class="client-info">
+                    <h3>Cliente:</h3>
+                    <p><strong>Pulpería San José</strong></p>
+                    <p>RUC: 281-150789-0002U</p>
+                    <p>Teléfono: 8888-8888</p>
+                    <p>Dirección: Frente al parque central, Rivas</p>
+                </div>
+                <div class="payment-info">
+                    <h3>Información de Pago:</h3>
+                    <p><strong>Condiciones:</strong> Crédito 10 días</p>
+                    <p><strong>Vendedor:</strong> Carlos Mendoza</p>
+                    <p><strong>Forma de pago:</strong> Transferencia</p>
+                </div>
+            </div>
+            
+            <table class="invoice-items">
+                <thead>
+                    <tr>
+                        <th width="50px">Cant.</th>
+                        <th>Descripción</th>
+                        <th width="100px">P. Unitario</th>
+                        <th width="100px">Descuento</th>
+                        <th width="100px">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>5</td>
+                        <td>Arroz Imperial 50kg</td>
+                        <td>C$ 850.00</td>
+                        <td>C$ 0.00</td>
+                        <td>C$ 4,250.00</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Aceite Capistrano 1L</td>
+                        <td>C$ 45.00</td>
+                        <td>C$ 0.00</td>
+                        <td>C$ 450.00</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Azúcar ISA 5kg</td>
+                        <td>C$ 120.00</td>
+                        <td>C$ 10.00</td>
+                        <td>C$ 230.00</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Sal La Fina 1kg</td>
+                        <td>C$ 18.00</td>
+                        <td>C$ 0.00</td>
+                        <td>C$ 144.00</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Leche Lala 1L</td>
+                        <td>C$ 32.00</td>
+                        <td>C$ 2.00</td>
+                        <td>C$ 90.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="invoice-totals">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>C$ 5,164.00</span>
+                </div>
+                <div class="total-row">
+                    <span>IVA (15%):</span>
+                    <span>C$ 774.60</span>
+                </div>
+                <div class="total-row">
+                    <span>Descuento:</span>
+                    <span>C$ 12.00</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>TOTAL:</span>
+                    <span>C$ 5,842.00</span>
+                </div>
+            </div>
+            
+            <div class="invoice-footer">
+                <p>¡Gracias por su compra!</p>
+                <p>Distribuidora FRIDAYS · 18 años sirviendo a la comunidad</p>
+                <p>Para consultas o aclaraciones contactar al: 2563-7890</p>
+                
+                <div class="print-only">
+                    <p>----------------------------------</p>
+                    <p>Firma y sello</p>
+                </div>
+                
+                <div class="invoice-actions">
+                    <button class="btn btn-outline" onclick="closeInvoicePreview()">Cerrar</button>
+                    <button class="btn btn-primary" onclick="window.print()">Imprimir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para manejar la interacción del menú
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => {
+                    i.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Cambiar el título de la página según la selección
+                const pageTitle = this.querySelector('span').textContent;
+                document.querySelector('.page-title').textContent = pageTitle;
+            });
+        });
+        
+        // Script para las tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Script para el modal de creación
+        function openCreateModal() {
+            document.getElementById('createModal').style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Vista previa de factura
+        function previewInvoice() {
+            document.getElementById('invoicePreview').style.display = 'flex';
+            closeModal('createModal');
+        }
+        
+        function closeInvoicePreview() {
+            document.getElementById('invoicePreview').style.display = 'none';
+        }
+        
+        function viewInvoice(id) {
+            // Aquí iría la lógica para ver el detalle de la factura
+            console.log("Viendo factura ID:", id);
+            previewInvoice();
+        }
+        
+        function printInvoice(id) {
+            // Aquí iría la lógica para imprimir la factura específica
+            console.log("Imprimiendo factura ID:", id);
+            previewInvoice();
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+        
+        // Cerrar modales al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+            if (event.target.classList.contains('invoice-preview')) {
+                closeInvoicePreview();
+            }
+        };
+    </script>
+</body>
+</html>
