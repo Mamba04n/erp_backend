@@ -9,6 +9,10 @@ app = FastAPI(title="ERP Backend", version="1.0")
 
 app.include_router(api_router)
 
+from app.api import ws_routes
+app.include_router(ws_routes.router)
+
+
 
 @app.on_event("startup")
 def on_startup():
