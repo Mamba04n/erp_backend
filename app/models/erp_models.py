@@ -10,7 +10,7 @@ class SyncStatus(str, enum.Enum):
     FAILED = "failed"
     PENDING = "pending"
 
-# --- Log de Notificaciones (AQUÍ ESTÁ LA CLASE QUE FALLABA) ---
+# --- Log de Notificaciones ---
 class SyncLog(Base):
     __tablename__ = "sync_logs"
 
