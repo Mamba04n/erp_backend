@@ -38,8 +38,8 @@ def get_db() -> Generator:
         db.close()
 
 
-def init_db() -> None:
+def init_db():
     """Initialize database (create tables). Import models first if any exist."""
     # Import your models here so they are registered on the metadata before create_all()
-    # from app import models  # Uncomment/adjust if you add models package
+    from app import models  # Uncomment/adjust if you add models package
     Base.metadata.create_all(bind=engine)
