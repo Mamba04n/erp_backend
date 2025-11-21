@@ -45,7 +45,7 @@ def seed_data():
                 print("Cancelado. No se hicieron cambios.")
                 return
 
-        print("🌱 Insertando catálogo de Distribuidora de Granos Básicos...")
+        print("Insertando catálogo de Distribuidora de Granos Básicos...")
 
         # 1. Crear Clientes (Pulperías y Negocios)
         print("   > Registrando Clientes (Pulperías)...")
