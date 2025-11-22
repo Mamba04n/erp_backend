@@ -84,3 +84,12 @@ def facturacion_page(request: Request):
 @app.get('/facturacion.html')
 def facturacion_page_html(request: Request):
     return templates.TemplateResponse('facturizacion.html', {"request": request})
+
+# 6. Perfil
+@app.get('/perfil')
+def perfil_page(request: Request):
+    return templates.TemplateResponse('perfil.html', {"request": request})
+
+@app.get('/perfil.html')
+def perfil_page_html(request: Request):
+    return templates.TemplateResponse('perfil.html', {"request": request})

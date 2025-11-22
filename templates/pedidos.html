@@ -27,7 +27,7 @@
                 <div class="menu-title">Principal</div>
                 <ul class="menu-items">
                     <li class="menu-item">
-                        <a href="index.html">
+                        <a href="/">
                             <i class="fas fa-home"></i>
                             <span>Dashboard</span>
                         </a>
@@ -45,7 +45,7 @@
                 <div class="menu-title">Gestión Comercial</div>
                 <ul class="menu-items">
                     <li class="menu-item">
-                        <a href="clientes.html">
+                        <a href="/clientes">
                             <i class="fas fa-users"></i>
                             <span>Clientes</span>
                         </a>
@@ -57,15 +57,27 @@
                         </a>
                     </li>
                     <li class="menu-item active">
-                        <a href="pedidos.html">
+                        <a href="/pedidos">
                             <i class="fas fa-shopping-cart"></i>
                             <span>Pedidos</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="facturizacion.html">
+                        <a href="/facturacion">
                             <i class="fas fa-file-invoice-dollar"></i>
                             <span>Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">Cuenta</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="/perfil">
+                            <i class="fas fa-user"></i>
+                            <span>Mi Perfil</span>
                         </a>
                     </li>
                 </ul>
@@ -384,19 +396,7 @@
     </div>
 
     <script>
-        // Script para manejar la interacción del menú
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.menu-item').forEach(i => {
-                    i.classList.remove('active');
-                });
-                this.classList.add('active');
-                
-                // Cambiar el título de la página según la selección
-                const pageTitle = this.querySelector('span').textContent;
-                document.querySelector('.page-title').textContent = pageTitle;
-            });
-        });
+
         
         // Script para las tabs
         document.querySelectorAll('.tab').forEach(tab => {

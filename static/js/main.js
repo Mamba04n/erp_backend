@@ -1,16 +1,4 @@
-// Script para manejar la interacción del menú
-document.querySelectorAll('.menu-item').forEach(item => {
-    item.addEventListener('click', function() {
-        document.querySelectorAll('.menu-item').forEach(i => {
-            i.classList.remove('active');
-        });
-        this.classList.add('active');
-        
-        // Cambiar el título de la página según la selección
-        const pageTitle = this.querySelector('span').textContent;
-        document.querySelector('.page-title').textContent = pageTitle;
-    });
-});
+// Script para funcionalidades generales
 
 async function createRandomOrder() {
     const token = localStorage.getItem('erp_token'); // Recuperar token
@@ -29,4 +17,18 @@ async function createRandomOrder() {
         },
         body: JSON.stringify(orderData)
     });
+}
+
+function logout() {
+    // Borrar token y usuario de ambos storages por compatibilidad
+    try {
+        sessionStorage.removeItem('erp_token');
+        sessionStorage.removeItem('erp_user');
+    } catch(e) {}
+    try {
+        localStorage.removeItem('erp_token');
+        localStorage.removeItem('erp_user');
+    } catch(e) {}
+    // Redirigir al login
+    window.location.href = '/login'; 
 }
