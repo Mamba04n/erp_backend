@@ -5,52 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FRIDAYS ERP - Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Ajusta esta ruta si tu CSS está en otra carpeta dentro de static -->
+    <link rel="stylesheet" href="/static/css/styles.css"> 
+    
+    <script>
+        // --- 1. PROTECCIÓN DE RUTA (SEGURIDAD) ---
+        // Usamos sessionStorage para que se borre al cerrar la ventana
+        const token = sessionStorage.getItem('erp_token');
+        if (!token) {
+            // FIX: Usamos window.location.origin para asegurar una URL válida completa
+            window.location.href = window.location.origin + '/login';
+        }
+    </script>
+
     <style>
-        /* Agrego estilos para notificaciones TOAST flotantes */
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-        .toast {
-            background: white;
-            border-left: 5px solid #2ecc71;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            animation: slideIn 0.3s ease-out;
-            min-width: 300px;
-        }
+        /* Estilos existentes... */
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: white; border-left: 5px solid #2ecc71; padding: 15px 20px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-radius: 4px; display: flex; align-items: center; animation: slideIn 0.3s ease-out; min-width: 300px; }
         .toast.warning { border-left-color: #e74c3c; }
         .toast i { margin-right: 10px; font-size: 1.2em; }
         .toast-content { flex-grow: 1; }
         .toast-time { font-size: 0.8em; color: #888; margin-top: 4px; }
         
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Status connection badge */
-        .conn-status {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 10px;
-            background: #ccc;
-            color: #333;
-        }
+        .conn-status { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; margin-left: 10px; background: #ccc; color: #333; }
         .conn-active { background: #2ecc71; color: white; }
         .conn-error { background: #e74c3c; color: white; }
+
+        /* NUEVO: Botón de Logout */
+        .logout-btn { 
+            cursor: pointer; 
+            color: #e74c3c; 
+            margin-left: 10px; 
+            font-size: 0.9em;
+            transition: transform 0.2s;
+        }
+        .logout-btn:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
-    <!-- Contenedor de Notificaciones Flotantes -->
+    <!-- Contenedor de Notificaciones -->
     <div id="toast-container"></div>
 
     <!-- Sidebar derecho -->
@@ -60,10 +55,16 @@
         </div>
         
         <div class="user-info">
-            <div class="user-avatar">A</div>
+            <div class="user-avatar">U</div>
             <div class="user-details">
-                <div class="user-name">Admin User</div>
-                <div class="user-role">Administrador <span id="ws-status" class="conn-status">Offline</span></div>
+                <!-- Nombre dinámico desde sesión -->
+                <div class="user-name" id="display-username">Usuario</div>
+                <div class="user-role">
+                    Conectado 
+                    <span id="ws-status" class="conn-status">Offline</span>
+                    <!-- Icono de Salir -->
+                    <i class="fas fa-sign-out-alt logout-btn" onclick="logout()" title="Cerrar Sesión"></i>
+                </div>
             </div>
         </div>
         
@@ -72,7 +73,7 @@
                 <div class="menu-title">Principal</div>
                 <ul class="menu-items">
                     <li class="menu-item active">
-                        <a href="#" onclick="return false;">
+                        <a href="/">
                             <i class="fas fa-home"></i>
                             <span>Dashboard</span>
                         </a>
@@ -90,7 +91,7 @@
                 <div class="menu-title">Gestión Comercial</div>
                 <ul class="menu-items">
                     <li class="menu-item">
-                        <a href="/clientes.html">
+                        <a href="/clientes">
                             <i class="fas fa-users"></i>
                             <span>Clientes</span>
                         </a>
@@ -102,9 +103,27 @@
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="/pedidos.html">
+                        <a href="/pedidos">
                             <i class="fas fa-shopping-cart"></i>
                             <span>Pedidos</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/facturacion">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <span>Facturación</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="menu-section">
+                <div class="menu-title">Cuenta</div>
+                <ul class="menu-items">
+                    <li class="menu-item">
+                        <a href="/perfil">
+                            <i class="fas fa-user"></i>
+                            <span>Mi Perfil</span>
                         </a>
                     </li>
                 </ul>
@@ -225,23 +244,53 @@
     </div>
 
     <!-- Lógica JavaScript Integrada -->
-    <script src="/static/js/main.js"></script>
     <script>
         const API_URL = "http://localhost:8000";
         const WS_URL = "ws://localhost:8000/ws/updates";
         let notificationCount = 0;
 
-        // 1. Inicialización
+        // --- 2. LÓGICA DE SESIÓN ---
+        
+        // Mostrar el usuario que inició sesión
+        document.getElementById('display-username').innerText = sessionStorage.getItem('erp_user') || 'Usuario';
+
+        function logout() {
+            sessionStorage.clear(); // Borrar token
+            // FIX: Usar ruta absoluta para evitar errores de "not a valid URL"
+            window.location.href = window.location.origin + '/login'; 
+        }
+
+        // Wrapper seguro para Fetch (Envía el token automáticamente)
+        async function authenticatedFetch(url, options = {}) {
+            const token = sessionStorage.getItem('erp_token');
+            
+            // Inyectar header Authorization
+            const headers = { ...options.headers, 'Authorization': `Bearer ${token}` };
+            const config = { ...options, headers };
+
+            const response = await fetch(url, config);
+
+            // Si el servidor dice 401 (Token inválido o expirado), sacar al usuario
+            if (response.status === 401) {
+                alert("Tu sesión ha expirado. Por favor ingresa nuevamente.");
+                logout();
+                return null;
+            }
+            return response;
+        }
+
+        // --- 3. INICIALIZACIÓN ---
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             connectWebSocket();
         });
 
-        // 2. Cargar Datos de la API
+        // Cargar Datos usando authenticatedFetch
         async function loadData() {
             try {
                 // A. Métricas Cards
-                const statsRes = await fetch(`${API_URL}/reports/dashboard`);
+                const statsRes = await authenticatedFetch(`${API_URL}/reports/dashboard`);
+                if (!statsRes) return;
                 const stats = await statsRes.json();
                 
                 document.getElementById('card-orders-today').innerText = stats.orders_today;
@@ -250,7 +299,8 @@
                 document.getElementById('card-sales').innerText = `C$ ${stats.total_sales.toLocaleString()}`;
 
                 // B. Tabla Pedidos Recientes
-                const ordersRes = await fetch(`${API_URL}/reports/recent-orders`);
+                const ordersRes = await authenticatedFetch(`${API_URL}/reports/recent-orders`);
+                if (!ordersRes) return;
                 const orders = await ordersRes.json();
                 const ordersBody = document.getElementById('orders-table-body');
                 ordersBody.innerHTML = '';
@@ -267,7 +317,8 @@
                 });
 
                 // C. Tabla Stock Bajo
-                const stockRes = await fetch(`${API_URL}/reports/low-stock`);
+                const stockRes = await authenticatedFetch(`${API_URL}/reports/low-stock`);
+                if (!stockRes) return;
                 const products = await stockRes.json();
                 const stockBody = document.getElementById('stock-table-body');
                 stockBody.innerHTML = '';
@@ -292,7 +343,7 @@
             }
         }
 
-        // 3. WebSockets en Tiempo Real
+        // --- 4. WebSockets en Tiempo Real ---
         function connectWebSocket() {
             const socket = new WebSocket(WS_URL);
             const statusEl = document.getElementById('ws-status');
@@ -323,7 +374,7 @@
             };
         }
 
-        // 4. Mostrar Notificación Flotante (Toast)
+        // Mostrar Toast
         function showToast(data) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -342,8 +393,6 @@
             }
 
             toast.className = `toast ${typeClass}`;
-            
-            // Extraer mensaje
             let msg = "Actualización recibida";
             if (data.payload.message) msg = data.payload.message;
             else if (data.payload.items) msg = `Venta: ${data.payload.items}`;
@@ -359,37 +408,35 @@
             `;
             
             container.appendChild(toast);
-            
-            // Auto eliminar a los 4 seg
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
 
-        // 5. Simular Pedido (Para probar sin Swagger)
+        // --- 5. Simular Pedido (Acción Protegida) ---
         async function createRandomOrder() {
             const randomProdId = Math.floor(Math.random() * 5) + 1; 
             const orderData = {
                 client_id: 1,
                 items: [{ product_id: randomProdId, quantity: 1 }]
             };
-            await fetch(`${API_URL}/orders/`, {
+            
+            // Usamos authenticatedFetch para enviar el token
+            const res = await authenticatedFetch(`${API_URL}/orders/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(orderData)
             });
+
+            if (res && !res.ok) {
+                // Si falla por permisos (ej. es Repartidor)
+                const err = await res.json();
+                alert("Error: " + err.detail);
+            }
         }
 
-        // Lógica original del menú
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                const pageTitle = this.querySelector('span').textContent;
-                document.querySelector('.page-title').textContent = pageTitle;
-            });
-        });
+
     </script>
 </body>
 </html>

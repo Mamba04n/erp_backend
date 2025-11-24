@@ -7,6 +7,12 @@
     gap: 12px;
     width: 100%;
     height: 100%;
+    padding: 12px 20px;
+}
+
+.menu-item i {
+    width: 20px;
+    text-align: center;
 }
 
 .menu-item a:visited,
@@ -130,10 +136,7 @@ body {
 }
 
 .menu-item {
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    padding: 0;
     cursor: pointer;
     transition: all 0.3s;
     border-right: 3px solid transparent;
@@ -148,6 +151,17 @@ body {
     border-right-color: var(--primary-color);
     color: var(--primary-color);
     font-weight: 500;
+}
+
+.menu-item a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    padding: 12px 20px;
 }
 
 .menu-item i {
