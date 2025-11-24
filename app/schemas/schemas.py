@@ -3,7 +3,7 @@ from typing import List, Optional
 from datetime import datetime, date
 
 # ==============================
-# 1. Esquemas de SEGURIDAD (Usuarios y Token)
+# 1. Esquemas de SEGURIDAD
 # ==============================
 class UserBase(BaseModel):
     username: str
@@ -36,6 +36,14 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     pass
 
+# NUEVO: Esquema para actualizar (todo opcional)
+class ProductUpdate(BaseModel):
+    name: Optional[str] = None
+    price: Optional[float] = None
+    stock: Optional[int] = None
+    category: Optional[str] = None
+    expiry_date: Optional[date] = None
+
 class ProductResponse(ProductBase):
     id: int
     class Config:
@@ -57,5 +65,23 @@ class OrderResponse(BaseModel):
     total_amount: float
     date: datetime
     status: str
+    class Config:
+        from_attributes = True
+
+# ==============================
+# 4. Esquemas de CLIENTES (RF-01)
+# ==============================
+class ClientBase(BaseModel):
+    name: str
+    email: str
+    contact: Optional[str] = None
+    address: Optional[str] = None
+    zone: Optional[str] = None
+
+class ClientCreate(ClientBase):
+    pass
+
+class ClientResponse(ClientBase):
+    id: int
     class Config:
         from_attributes = True
